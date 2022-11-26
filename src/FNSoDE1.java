@@ -182,7 +182,8 @@ public class FNSoDE1 {
 					U[i + 1][j] += (UF1[i][j] + UF1[i + 2][j] + UF1[i + 1][j - 1] + UF1[i + 1][j + 1]) / 16;
 			}
 		}
-		for (int k = 1; k <= approximations; k++) {
+		for (int k = 1, nCells = 50; k <= approximations; k++) {
+			progressbarShow(k, approximations, nCells, "Аппроксимаций выполнено ");
 			for (int i = 1; i < tableSize; i++) {
 				for (int j = 1; j < tableSize; j++) {
 					if (k % 2 != 0) {
@@ -320,15 +321,8 @@ public class FNSoDE1 {
 		}
 		// прямой ход (или приведение матрицы к треугольному виду)
 
-		for (int p = 0, del = 20; p < tableSize; p++) { // с помощью цикла перебираем все уравнения
-			StringBuilder stringBuilder = new StringBuilder("|");
-			int progress = del * p / tableSize ;
-			for (int i = 0; i < progress; i++)
-				stringBuilder.append("=");
-			for (int i = progress; i < del; i++)
-				stringBuilder.append("Х");
-			stringBuilder.append("|\r");
-			System.out.print(stringBuilder);
+		for (int p = 0, nCells = 50; p < tableSize; p++) { // с помощью цикла перебираем все уравнения
+			progressbarShow(p, tableSize, nCells, "Обработано строк ");
 			int max = p; // задаём максимальное значение первого ненулевого коэффициента в уравнении
 			for (int i = p + 1; i < tableSize; i++) { // пробегаем по столбцам и ищем максимальное значение
 				if (Math.abs(A[i][p]) > Math.abs(A[max][p])) {
@@ -379,5 +373,22 @@ public class FNSoDE1 {
 			}
 			System.out.println("║   " + String.format("%.3f", A[i][n]) + "\t║");
 		}
+	}
+
+	public static void progressbarShow(int nTaskCompleted, int nTaskCount, int nCells, String comment){
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(comment)
+				.append(" |");
+		int progress = nCells * nTaskCompleted / nTaskCount ;
+		for (int i = 0; i < progress; i++)
+			stringBuilder.append("=");
+		for (int i = progress; i < nCells; i++)
+			stringBuilder.append("Х");
+		stringBuilder.append("| ")
+				.append(nTaskCompleted)
+				.append(" / ")
+				.append(nTaskCount)
+				.append("\r");
+		System.out.print(stringBuilder);
 	}
 }
