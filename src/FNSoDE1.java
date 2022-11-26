@@ -4,7 +4,7 @@ public class FNSoDE1 {
 
 	static Scanner scanner = new Scanner(System.in);
 	static double calculationError;
-	static final int APPROXIMATIONS;
+	static int approximations;
 	static final int DEFAULT_TABLE_SIZE;
 	static int tableSize;
 	static double[][] U;
@@ -21,11 +21,20 @@ public class FNSoDE1 {
 	static boolean printingTable = false;
 
 	static {
-		APPROXIMATIONS = 60;
+		approximations = 1000;
 		DEFAULT_TABLE_SIZE = 3;
 		updateTableSize(DEFAULT_TABLE_SIZE - 1);
 		System.out.println("\tАнализ быстрого численного метода решения уравнения Лапласа");
 		requestNewTableSize();
+	}
+
+	public static void requestNewApproximations(){
+		System.out.print("\nВведите новое значение аппрокисмации: ");
+		int tmp = scanner.nextInt();
+		if (tmp < 1)
+			System.out.println("Аппроксимация не может быть меньше 1");
+		else
+			approximations = tmp;
 	}
 
 	public static void requestNewTableSize(){
@@ -43,15 +52,35 @@ public class FNSoDE1 {
 	}
 
 	public static void updateTables(){
+		initArrays();
+		computeValueStep();
+		computeBoardValues();
+		F = 0;
+		setupTableOfBoundaryConditions();
+		laplasCorrectSolution();
+	}
+
+	public static void initArrays(){
+		initValuesTablesArrays();
+		initBoundArrays();
+	}
+	public static void initValuesTablesArrays(){
 		U = new double[tableSize + 1][tableSize + 1];
 		UT = new double[tableSize + 1][tableSize + 1];
 		UF1 = new double[tableSize + 1][tableSize + 1];
+	}
+	public static void initBoundArrays(){
 		Yup = new double[tableSize + 1];
 		Ydown = new double[tableSize + 1];
 		Xleft = new double[tableSize + 1];
 		Xright = new double[tableSize + 1];
+	}
+
+	public static void computeValueStep(){
 		ΔhX = (double) (B - A) / tableSize;
 		ΔhY = (double) (D - C) / tableSize;
+	}
+	public static void computeBoardValues(){
 		for (int i = 0; i <= tableSize; i++) {
 			// Лаплас 1
 			Yup[i] = Math.cos(C + ΔhY * i);
@@ -64,12 +93,9 @@ public class FNSoDE1 {
 			// Xleft[i] = Math.sin(Math.PI * X[i] / B);
 			// Xright[i] = 0;
 		}
-		F = 0;
-		setupMatrixOfBoundaryConditions();
-		laplasCorrectSolution();
 	}
 
-	public static void setupMatrixOfBoundaryConditions(){
+	public static void setupTableOfBoundaryConditions(){
 		MatrixOfBoundaryConditions(U);
 		MatrixOfBoundaryConditions(UT);
 		MatrixOfBoundaryConditions(UF1);
@@ -109,6 +135,7 @@ public class FNSoDE1 {
 				.withMenuItem(2, "Решение уравнения Лапласа численным методом конечных разностей.", FNSoDE1::finiteDifferenceMethod)
 				.withMenuItem(3, "Включить / выключить вывод таблиц.", FNSoDE1::changePrintTableMod)
 				.withMenuItem(4, "Изменить размерность.", FNSoDE1::requestNewTableSize)
+				.withMenuItem(5, "Изменить аппроксимацию.", FNSoDE1::requestNewApproximations)
 			.runInfinityLoop();
 
 		System.out.println("Программа завершена.");
@@ -155,7 +182,7 @@ public class FNSoDE1 {
 					U[i + 1][j] += (UF1[i][j] + UF1[i + 2][j] + UF1[i + 1][j - 1] + UF1[i + 1][j + 1]) / 16;
 			}
 		}
-		for (int k = 1; k <= APPROXIMATIONS; k++) {
+		for (int k = 1; k <= approximations; k++) {
 			for (int i = 1; i < tableSize; i++) {
 				for (int j = 1; j < tableSize; j++) {
 					if (k % 2 != 0) {
@@ -166,7 +193,7 @@ public class FNSoDE1 {
 				}
 			}
 		}
-		if (APPROXIMATIONS % 2 != 0) {
+		if (approximations % 2 != 0) {
 			U = UF1;
 		}
 		System.out.println("Решение уравнения Лапласа быстрым численным методом:");
@@ -236,6 +263,7 @@ public class FNSoDE1 {
 				M[i][p] -= ΔhX * ΔhY * F;
 			}
 		}
+		printTableG(M,p);
 		methodGauss(M, p, ΔU);
 		for (int i = 1; i < tableSize; i++) {
 			System.arraycopy(ΔU, (i - 1) * (tableSize - 1), U[i], 1, tableSize - 1);
@@ -342,6 +370,14 @@ public class FNSoDE1 {
 			}
 			X[i] = (B[i] - sum) / A[i][i]; // получаем значение b[i], то есть делим свободный член (отнимать счётчик при
 														// последующих манипуляциях) на коэффициент при b[i]
+		}
+	}
+	public static void printTableG(double A[][], int n) {
+		for (int i = 0; i < n; i++) { // цикл, проходящий строки матрицы
+			for (int j = 0; j < n; j++) { // цикл, заполняющий ячейки текущей строки
+				System.out.print("║  " + String.format("%.3f", A[i][j]) + "\t");
+			}
+			System.out.println("║   " + String.format("%.3f", A[i][n]) + "\t║");
 		}
 	}
 }
