@@ -1,7 +1,3 @@
-import javafx.util.Pair;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 public class FNSoDE1 {
@@ -9,6 +5,7 @@ public class FNSoDE1 {
 	static Scanner scanner = new Scanner(System.in);
 	static double calculationError;
 	static final int APPROXIMATIONS;
+	static final int DEFAULT_TABLE_SIZE;
 	static int tableSize;
 	static double[][] U;
 	static double[][] UT;
@@ -25,9 +22,27 @@ public class FNSoDE1 {
 
 	static {
 		APPROXIMATIONS = 60;
+		DEFAULT_TABLE_SIZE = 3;
+		updateTableSize(DEFAULT_TABLE_SIZE - 1);
 		System.out.println("\tАнализ быстрого численного метода решения уравнения Лапласа");
+		requestNewTableSize();
+	}
+
+	public static void requestNewTableSize(){
 		System.out.print("\nВведите размерность исследуемой области: ");
-		tableSize = scanner.nextInt() - 1;
+		int tmp = scanner.nextInt() - 1;
+		if (tmp < DEFAULT_TABLE_SIZE - 1)
+			System.out.printf("Размерность не может быть меньше %d%n", DEFAULT_TABLE_SIZE);
+		else
+			updateTableSize(tmp);
+	}
+
+	public static void updateTableSize(int newTableSize){
+		tableSize = newTableSize;
+		updateTables();
+	}
+
+	public static void updateTables(){
 		U = new double[tableSize + 1][tableSize + 1];
 		UT = new double[tableSize + 1][tableSize + 1];
 		UF1 = new double[tableSize + 1][tableSize + 1];
@@ -50,6 +65,27 @@ public class FNSoDE1 {
 			// Xright[i] = 0;
 		}
 		F = 0;
+		setupMatrixOfBoundaryConditions();
+		laplasCorrectSolution();
+	}
+
+	public static void setupMatrixOfBoundaryConditions(){
+		MatrixOfBoundaryConditions(U);
+		MatrixOfBoundaryConditions(UT);
+		MatrixOfBoundaryConditions(UF1);
+	}
+	public static void laplasCorrectSolution(){
+		// Лаплас 1
+		for (int i = 1; i < tableSize; i++)
+			for (int j = 1; j < tableSize; j++)
+				UT[i][j] = Math.cos(A + ΔhX * j) * Math.exp(C + ΔhY * i);
+		// Лаплас 2
+//		for (int i = 1; i < tableSize; i++)
+//			for (int j = 1; j < tableSize; j++)
+//				UT[i][j] = Math.sinh(Math.PI * (B - A + ΔhX * j) / D) / Math.sinh(Math.PI * B / D)
+//					* Math.sin(Math.PI * (C + ΔhY * i) / D)
+//					+ Math.sinh(Math.PI * (D - (C + ΔhY * i)) / B)
+//					/ Math.sinh(Math.PI * D / B) * Math.sin(Math.PI * (A + ΔhX * j) / B);
 	}
 
 	public static void main(String[] args) {
@@ -68,28 +104,11 @@ public class FNSoDE1 {
 		 * U - массив значений искомой функции, вычисленных численным методом,
 		 * M - массив для составления трёхдиагональной матрицы,
 		 */
-		MatrixOfBoundaryConditions(U);
-		MatrixOfBoundaryConditions(UT);
-		MatrixOfBoundaryConditions(UF1);
-		// Лаплас 1
-		for (int i = 1; i < tableSize; i++) {
-			for (int j = 1; j < tableSize; j++) {
-				UT[i][j] = Math.exp(A + ΔhX * i) * Math.cos(C + ΔhY * j);
-			}
-		}
-		// Лаплас 2
-		// for (int i = 1; i < tableSize; i++) {
-		// for (int j = 1; j < tableSize; j++) {
-		// UT[i][j] = Math.sinh(Math.PI * (B - X[j]) / D) / Math.sinh(Math.PI * B / D)
-		// * Math.sin(Math.PI * Y[i] / D)
-		// + Math.sinh(Math.PI * (D - Y[i]) / B)
-		// / Math.sinh(Math.PI * D / B) * Math.sin(Math.PI * X[j] / B);
-		// }
-		// }
 		new Menu().withExitOnZero()
 				.withMenuItem(1, "Решение уравнения Лапласа быстрым численным методом.", FNSoDE1::fastMethod)
 				.withMenuItem(2, "Решение уравнения Лапласа численным методом конечных разностей.", FNSoDE1::finiteDifferenceMethod)
 				.withMenuItem(3, "Включить / выключить вывод таблиц.", FNSoDE1::changePrintTableMod)
+				.withMenuItem(4, "Изменить размерность.", FNSoDE1::requestNewTableSize)
 			.runInfinityLoop();
 
 		System.out.println("Программа завершена.");
