@@ -96,9 +96,9 @@ public class FNSoDE1 {
 	}
 
 	public static void setupTableOfBoundaryConditions(){
-		MatrixOfBoundaryConditions(U);
-		MatrixOfBoundaryConditions(UT);
-		MatrixOfBoundaryConditions(UF1);
+		U = MatrixOfBoundaryConditions(U);
+		UT = MatrixOfBoundaryConditions(UT);
+		UF1 = MatrixOfBoundaryConditions(UF1);
 	}
 	public static void laplasCorrectSolution(){
 		// Лаплас 1
@@ -145,11 +145,7 @@ public class FNSoDE1 {
 	public static void fastMethod(){
 		long millis = System.currentTimeMillis();
 		calculationError = 0;
-		for (int i = 1; i < tableSize; i++) {
-			for (int j = 1; j < tableSize; j++) {
-				U[i][j] = 0;
-			}
-		}
+		U = MatrixOfBoundaryConditions(new double[tableSize + 1][tableSize + 1]);
 		for (int i = 1; i <= tableSize; i++) {
 			for (int j = 1; j < tableSize; j++) {
 				if (i != tableSize)
@@ -182,6 +178,7 @@ public class FNSoDE1 {
 					U[i + 1][j] += (UF1[i][j] + UF1[i + 2][j] + UF1[i + 1][j - 1] + UF1[i + 1][j + 1]) / 16;
 			}
 		}
+		System.out.printf("4 начальных приближения выполены: %d%n", System.currentTimeMillis() - millis);
 		for (int k = 1, nCells = 50; k <= approximations; k++) {
 			progressbarShow(k, approximations, nCells, "Аппроксимаций выполнено ");
 			for (int i = 1; i < tableSize; i++) {
@@ -271,13 +268,14 @@ public class FNSoDE1 {
 		}
 	}
 
-	public static void MatrixOfBoundaryConditions(double[][] matrix) { // присвоение таблицам граничных значений
+	public static double[][] MatrixOfBoundaryConditions(double[][] matrix) { // присвоение таблицам граничных значений
 		for (int i = 0; i <= tableSize; i++) {
 			matrix[C][i] = Yup[i];
 			matrix[D * tableSize][i] = Ydown[i];
 			matrix[i][A] = Xleft[i];
 			matrix[i][B * tableSize] = Xright[i];
 		}
+		return matrix;
 	}
 
 	public static void changePrintTableMod(){
