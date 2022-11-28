@@ -32,7 +32,7 @@ public class Menu {
                 this.menu.get(menuItemId).getSecond().run();
                 scanner.nextLine();
             } catch (Exception e) {
-                System.out.println("Введённый ");
+                System.out.println("Ошибка на этапе выбора действия в меню");
                 //e.printStackTrace();
             }
             System.out.println();
