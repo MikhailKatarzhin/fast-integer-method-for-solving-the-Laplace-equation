@@ -204,7 +204,7 @@ public class FNSoDE1 {
 			}
 		}
 		calculationError = calculationError / Math.pow((tableSize - 1), 2);
-		System.out.printf("Погрешность вычислений в процентах: %.6f%n", calculationError);
+		System.out.printf("Погрешность вычислений: %.6f%%%n", calculationError);
 		System.out
 				.println("Время проведённых вычислений: " + ((System.currentTimeMillis() - millis)) + " мс.");
 	}
@@ -365,12 +365,14 @@ public class FNSoDE1 {
 		}
 	}
 	public static void printTableG(double A[][], int n) {
+		StringBuilder tableView = new StringBuilder();
 		for (int i = 0; i < n; i++) { // цикл, проходящий строки матрицы
 			for (int j = 0; j < n; j++) { // цикл, заполняющий ячейки текущей строки
-				System.out.print("║  " + String.format("%.3f", A[i][j]) + "\t");
+				tableView.append(String.format("║  %.3f\t", A[i][j]));
 			}
-			System.out.println("║   " + String.format("%.3f", A[i][n]) + "\t║");
+			tableView.append(String.format("║  %.3f\t", A[i][n]));
 		}
+		System.out.println(tableView);
 	}
 
 	public static void progressbarShow(int nTaskCompleted, int nTaskCount, int nCells, String comment){
