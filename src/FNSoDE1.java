@@ -285,31 +285,33 @@ public class FNSoDE1 {
 	public static void PrintTable(double[][] matrix) { // функция для вывода таблицы значений
 		if (!printingTable)
 			return;
-		System.out.print("╔═══════╦");
+		StringBuilder tableView = new StringBuilder();
+		tableView.append("╔═══════╦");
 		for (int i = 0; i < tableSize; i++) {
-			System.out.print("══════════╦");
+			tableView.append("══════════╦");
 		}
-		System.out.print("══════════╗\n║ " + "U(x,y)" + "");
+		tableView.append("══════════╗\n║ U(x,y)");
 		for (int i = 0; i < tableSize + 1; i++) { // цикл, заполняющий шапку таблицы
-			System.out.print("║   " + String.format("%.2f", A + ΔhX * i) + "   ");
+			tableView.append(String.format("║   %.2f   ", A + ΔhX * i));
 		}
-		System.out.print("║\n╠═══════╬");
+		tableView.append("║\n╠═══════╬");
 		for (int i = 0; i < tableSize; i++) {
-			System.out.print("══════════╬");
+			tableView.append("══════════╬");
 		}
-		System.out.print("══════════╣\n");
+		tableView.append("══════════╣\n");
 		for (int i = 0; i < tableSize + 1; i++) { // цикл, проходящий строки таблицы
-			System.out.print("║ " + String.format("%.2f", C + ΔhY * i) + "\t");
+			tableView.append(String.format("║ %.2f\t", C + ΔhY * i));
 			for (int j = 0; j < tableSize + 1; j++) { // цикл, заполняющий ячейки текущей строки
-				System.out.print("║ " + String.format("%.6f", matrix[i][j]) + " ");
+				tableView.append(String.format("║ %.6f ", matrix[i][j]));
 			}
-			System.out.println("║");
+			tableView.append("║\n");
 		}
-		System.out.print("╚═══════╩");
+		tableView.append("╚═══════╩");
 		for (int i = 0; i < tableSize; i++) {
-			System.out.print("══════════╩");
+			tableView.append("══════════╩");
 		}
-		System.out.print("══════════╝\n");
+		tableView.append("══════════╝\n");
+		System.out.println(tableView);
 	}
 
 	public static void methodGauss(double[][] A, int tableSize, double[] X) { // функция, реализующая метод Гаусса
