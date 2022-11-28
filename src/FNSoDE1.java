@@ -130,16 +130,19 @@ public class FNSoDE1 {
 		 * U - массив значений искомой функции, вычисленных численным методом,
 		 * M - массив для составления трёхдиагональной матрицы,
 		 */
-		new Menu().withExitOnZero()
+		Menu menu = createMenu();
+		menu.runInfinityLoop();
+		System.out.println("Программа завершена.");
+		scanner.close();
+	}
+	public static Menu createMenu(){
+		return new Menu().withExitOnZero()
 				.withMenuItem(1, "Решение уравнения Лапласа быстрым численным методом.", FNSoDE1::fastMethod)
 				.withMenuItem(2, "Решение уравнения Лапласа численным методом конечных разностей.", FNSoDE1::finiteDifferenceMethod)
 				.withMenuItem(3, "Включить / выключить вывод таблиц.", FNSoDE1::changePrintTableMod)
-				.withMenuItem(4, "Изменить размерность.", FNSoDE1::requestNewTableSize)
-				.withMenuItem(5, "Изменить аппроксимацию.", FNSoDE1::requestNewApproximations)
-			.runInfinityLoop();
-
-		System.out.println("Программа завершена.");
-		scanner.close();
+				.withMenuItem(4, "Включить / выключить режим многопоточной обработки.", FNSoDE1::changeMultiThreadMod)
+				.withMenuItem(5, "Изменить размерность.", FNSoDE1::requestNewTableSize)
+				.withMenuItem(6, "Изменить аппроксимацию.", FNSoDE1::requestNewApproximations);
 	}
 
 	public static void fastMethod(){
